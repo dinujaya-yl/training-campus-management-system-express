@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    "types": ["node", "jest"],
+
+    "strict": true,
+    "esModuleInterop": true,
+
+    "sourceMap": true,
+
+    "skipLibCheck": true,
+
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true
+  },
+
+  "include": ["src", "test"]
+}

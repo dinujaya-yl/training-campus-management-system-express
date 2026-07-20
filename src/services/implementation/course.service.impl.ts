@@ -4,6 +4,7 @@ import courseRepository from "../../repositories/course.repository.js";
 import enrollmentRepository from "../../repositories/enrollment.repository.js";
 import type { User } from "../../models/user.model.js";
 import type { Enrollment } from "../../models/enrollment.model.js";
+import { ConflictError, ValidationError } from "../../errors/http.errors.js";
 // import type { networkInterfaces } from "os";
 // import { comparedPassword, hashPassword } from "../../config/bcrypt";
 // import generateToken from "../../util/generateToken";
@@ -24,7 +25,7 @@ class CourseServicesImpl implements CourseServices {
         if (student && course) {
             return enrollmentRepository.findByStudentAndCourse(student, course);
         } else {
-            throw new Error('Invalid course ID');
+            throw new ValidationError('Invalid course ID');
         }
         
     }
@@ -37,13 +38,13 @@ class CourseServicesImpl implements CourseServices {
             // console.log('Course limit of students: ', courseData);
 
             if (courseData?.max_students && courseData?.max_students <= enrolledStudents) {
-                throw new Error('Maximum seat limit exceeded!');
+                throw new ConflictError('Maximum seat limit exceeded!');
             };
 
             const isRegistered = await enrollmentRepository.checkDuplicateEnrollment(user.id, course.id);
             // console.log('Is Registered: ', )
             if (isRegistered) {
-                throw new Error('User already registered for the course!');
+                throw new ConflictError('User already registered for the course!');
             }
 
             await courseRepository.reserveSeat(course.id, user.id, reservationID);
@@ -55,7 +56,7 @@ class CourseServicesImpl implements CourseServices {
 
             } catch (err) {
                 await courseRepository.releaseSeat(course.id, reservationID);
-                throw err
+                throw new ConflictError('Could not find a seat!')
 
             }
 
@@ -64,7 +65,7 @@ class CourseServicesImpl implements CourseServices {
             // console.log('Student and course id: ', user.id)
             return enrollment
         } else {
-            throw new Error('Invalid user or course ID')
+            throw new ValidationError('Invalid user or course ID')
         }
         
         

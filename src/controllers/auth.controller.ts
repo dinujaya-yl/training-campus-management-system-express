@@ -3,6 +3,7 @@ import type { JwtPayload} from 'jsonwebtoken';
 import jwt from 'jsonwebtoken';
 import type { AuthenticatedRequest } from "../types/express.js";
 import type { User } from '../models/user.model.js';
+import { ForbiddenError, UnauthorizedError } from '../errors/http.errors.js';
 
 interface UserParams {
     id: string
@@ -20,8 +21,7 @@ export class AuthController {
             }
 
             if (!token) {
-                res.status(401);
-                throw Error('Not logged in. Please log in to get access!');
+                throw new UnauthorizedError('Please log in!');
             }
             const SECRET_KEY = process.env.JWT_SECRET || '12345678901234567890123456789012';
             // console.log('Secret: ', SECRET_KEY);
@@ -53,12 +53,12 @@ export class AuthController {
                 if (req.user?.id === req.params.id) {
                     // pass
                 } else if (!req.user?.role || !roles.includes(req.user.role)) {
-                    throw new Error('Not Permitted. Restricted data!');
+                    throw new ForbiddenError('Not permitted. Restricted data!');
                 } else {
                     //pass
                 }
             } else if (!req.user?.role || !roles.includes(req.user.role)) {
-                throw new Error('Not authenticated for the permitted role!');
+                throw new ForbiddenError('Not authenticated for the permitted role!')
             }
         next();
     } catch(err) {

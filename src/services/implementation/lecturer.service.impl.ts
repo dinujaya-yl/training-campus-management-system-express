@@ -3,6 +3,7 @@ import courseRepository from "../../repositories/course.repository.js";
 import type { User } from "../../models/user.model.js";
 import type { LecturerService } from "../lecturer.service.js";
 import type { Course } from "../../models/course.model.js";
+import { ConflictError } from "../../errors/http.errors.js";
 // import { comparedPassword, hashPassword } from "../../config/bcrypt";
 // import generateToken from "../../util/generateToken";
 
@@ -35,7 +36,7 @@ class LecturerServicesImpl implements LecturerService {
         
         const existingUser = await UserRepository.findByEmail(lecturer.email!);
         if (existingUser) {
-            throw new Error('Email already in use');
+            throw new ConflictError('Email already in use');
         }
         // user.password = await hashPassword(user.password!);
         return UserRepository.register(lecturer);

@@ -4,6 +4,7 @@ import type { StudentServices } from '../services/student.service.js';
 import generateToken from '../utils/generateToken.util.js';
 import type { AuthenticatedRequest } from '../types/express.js';
 import type { TypedRequest } from '../types/typed-request.js';
+import { NotFoundError, ValidationError } from '../errors/http.errors.js';
 // import { UserService } from './services/UserService';
 // import { User } from './models/User';
 
@@ -29,7 +30,8 @@ export class StudentController {
             const mySelf = await this.studentServices.getStudentById(req.user?.id);
 
             if (!mySelf) {
-                res.status(404).send('Your profile not found!');
+                throw new NotFoundError('Your profile not found!')
+                // res.status(404).send('Your profile not found!');
             } else {
                 res.status(200).json(mySelf);
             }
@@ -43,10 +45,7 @@ export class StudentController {
             const user = await this.studentServices.getStudentById(req.params.id);
             
             if (user == null) {
-                res.status(404).json({
-                    "status": "Error",
-                    "message": "Student not found!"
-                });
+                throw new NotFoundError('Student not found!');
             } else {
                 res.status(200).json(user);
             }
@@ -83,19 +82,12 @@ export class StudentController {
             const{name, email, password} = req.body;
 
             if (!email || !password) {
-                res.status(400)
-                throw new Error('Email and Password Required!')
+                throw new ValidationError('Email and Password Required!')
             }
-
-            // if (password != confirmPassword) {
-            //     res.status(400)
-            //     throw new Error('Password and confirmation should match!')
-            // }
 
             const newUser = await this.studentServices.registerStudent({
                 name: name,
                 email: email,
-        // res.send(`Registered user. ID: ${user.id}`);.email,
                 password: password,
             });
 

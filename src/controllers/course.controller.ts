@@ -3,6 +3,7 @@ import type { CourseServices } from '../services/course.service.js';
 import type { AuthenticatedRequest } from '../types/express.js';
 import { v4 as uuidv4 } from "uuid";
 import { enqueueEnrollment, enrollmentEvents, processQueue } from '../utils/enrollment.worker.js';
+import { ConflictError, TimeouttError, UnauthorizedError } from '../errors/http.errors.js';
 // import { User } from '../models/user.model';
 // import { UserService } from './services/UserService';
 // import { User } from './models/User';
@@ -56,7 +57,8 @@ export class CourseController {
     enrollStudent = async (req:AuthenticatedRequest<UserParams>, res: Response, next: NextFunction) => {
         try {
             if (!req.user?.id || !req.params.id) {
-                res.status(401).send("Please log in!");
+                throw new UnauthorizedError('Please log in!');
+                // res.status(401).send("Please log in!");
             } else {
                 const reservationId = uuidv4();
 
@@ -69,7 +71,7 @@ export class CourseController {
                 const result = await new Promise<{ success: boolean; message: string}>((resolve, reject) => {
                     const timer = setTimeout(() => {
                         enrollmentEvents.removeAllListeners(reservationId);
-                        reject(new Error("Enrollment request timed out"));
+                        reject(new TimeouttError("Enrollment request timed out"));
                     }, 15000)
 
                     enrollmentEvents.once(reservationId, (outcome) => {
@@ -90,7 +92,8 @@ export class CourseController {
         try {
             const enrollment = await this.courseServices.getEnrollmentByStudentAndId(req.user?.id, req.params.id);
             if (!enrollment){
-                throw new Error('Can\'t withdraw from a course before enrolling!')
+                throw new ConflictError('Can\'t withdraw from a course before enrolling');
+                // throw new Error('Can\'t withdraw from a course before enrolling!')
             }
             const deleted = await this.courseServices.unenrollStudent(enrollment.id);
 

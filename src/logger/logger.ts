@@ -35,7 +35,11 @@ const loggerOptions: LoggerOptions = {
   level: getLevel(),
   levels,
   format: format.json(),
-  transports: [new transports.Console({ format: consoleFormat })],
+  transports: [
+    new transports.Console({ format: consoleFormat }),
+    new transports.File({ filename: "logs/error.log", level: "error" }),
+    new transports.File({ filename: "logs/combined.log" }),
+  ],
   exitOnError: false,
 };
 

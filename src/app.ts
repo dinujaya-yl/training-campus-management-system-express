@@ -12,6 +12,8 @@ app.use(express.json());
 
 app.use(morganLogger)
 
+app.get('/health', (_req, res) => res.status(200).json({ status: 'ok'}))
+
 app.use('/students/', studentRouter);
 app.use('/lecturers/', lecturerRouter);
 app.use('/courses/', courseRouter)

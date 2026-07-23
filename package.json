@@ -5,9 +5,16 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
-    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage"
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+
+    "start:test": "cross-env NODE_ENV=test tsx src/server.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +37,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.61.1",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
@@ -40,6 +48,7 @@
     "eslint": "^10.6.0",
     "eslint-config-prettier": "^10.1.8",
     "jest": "^30.4.2",
+    "mongodb-memory-server": "^11.2.0",
     "nodemon": "^3.1.14",
     "prettier": "^3.9.4",
     "ts-jest": "^29.4.11",
